@@ -6,7 +6,12 @@ body {
     color: #333;
 }
 
-/* Container for content */
+/* Dark mode styles */
+body.dark-mode {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
 .container {
     max-width: 600px;
     width: 100%;
@@ -17,11 +22,21 @@ body {
     transition: all 0.3s ease;
     margin: 0 auto;
     padding: 2rem;
+    position: relative;
+}
+
+body.dark-mode .container {
+    background-color: #1e1e1e;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .container:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+body.dark-mode .container:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.6);
 }
 
 /* Typography */
@@ -37,6 +52,10 @@ h1, h2, h3 {
     margin-bottom: 30px;
 }
 
+body.dark-mode .description {
+    color: #bbb;
+}
+
 /* Tabs */
 .tabs {
     display: flex;
@@ -44,6 +63,10 @@ h1, h2, h3 {
     background-color: #f0f0f0;
     border-radius: 50px;
     padding: 5px;
+}
+
+body.dark-mode .tabs {
+    background-color: #333;
 }
 
 .tab {
@@ -58,6 +81,10 @@ h1, h2, h3 {
     transition: all 0.3s ease;
     font-weight: 600;
     color: #777;
+}
+
+body.dark-mode .tab {
+    color: #bbb;
 }
 
 .tab.active {
@@ -93,6 +120,14 @@ input[type="file"] {
     font-size: 14px;
 }
 
+body.dark-mode input[type="text"],
+body.dark-mode input[type="password"],
+body.dark-mode input[type="file"] {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
 input[type="text"]:focus,
 input[type="password"]:focus {
     border-color: #6c5ce7;
@@ -126,6 +161,43 @@ button:disabled {
     box-shadow: none;
 }
 
+/* Dark mode toggle button */
+#darkModeToggle {
+    background-color: #6c5ce7;
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    width: 50px;
+    height: 25px;
+    text-align: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 5px;
+}
+
+#darkModeToggle:hover {
+    background-color: #5a4bd1;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+}
+
+#darkModeIcon {
+    transition: transform 0.3s ease;
+}
+
+body.dark-mode #darkModeIcon {
+    transform: translateX(25px);
+}
+
 /* Progress bar */
 .progress-bar {
     width: 100%;
@@ -133,6 +205,10 @@ button:disabled {
     border-radius: 50px;
     margin-bottom: 20px;
     overflow: hidden;
+}
+
+body.dark-mode .progress-bar {
+    background-color: #333;
 }
 
 .progress {
@@ -161,10 +237,18 @@ button:disabled {
     margin-bottom: 5px;
 }
 
+body.dark-mode .stat h3 {
+    color: #bbb;
+}
+
 .stat p {
     font-size: 18px;
     font-weight: 600;
     color: #4a4a4a;
+}
+
+body.dark-mode .stat p {
+    color: #e0e0e0;
 }
 
 /* Log area */
@@ -178,6 +262,12 @@ button:disabled {
     resize: vertical;
 }
 
+body.dark-mode #log {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
 textarea {
     width: 100%;
     padding: 0.75rem 1rem;
@@ -187,6 +277,12 @@ textarea {
     box-sizing: border-box;
     margin-bottom: 1rem;
     resize: vertical;
+}
+
+body.dark-mode textarea {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #555;
 }
 
 /* Result area */
@@ -199,6 +295,12 @@ textarea {
     background-color: #f9f9f9;
     font-size: 14px;
     line-height: 1.6;
+}
+
+body.dark-mode .result {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border-color: #555;
 }
 
 /* Átirás button styles */
