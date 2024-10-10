@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whisper UI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Whisper UI</h1>
+        <p class="description">Hangfájlok átírása az OpenAI Whisper API segítségével</p>
+        
+        <div class="tabs">
+            <button class="tab active" data-tab="input">Input</button>
+            <button class="tab" data-tab="process">Process</button>
+            <button class="tab" data-tab="output">Output</button>
+        </div>
+        
+        <div id="input" class="tab-content active">
+            <div class="mb-3">
+                <label for="apiKey" class="form-label">OpenAI API kulcs</label>
+                <input type="password" class="form-control" id="apiKey" placeholder="Írja be az OpenAI API kulcsát">
+                <small class="form-text text-muted">Az API kulcsot a fiókjából szerezheti be.</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="audioFile" class="form-label">Hangfájl feltöltése</label>
+                <input type="file" class="form-control" id="audioFile" accept=".mp3, .mp4, .mpeg, .mpga, .wav, .webm, .flac, .m4a, .ogg, .oga">
+                <small class="form-text text-muted">Támogatott formátumok: MP3, MP4, MPEG, MPGA, WAV, WEBM, FLAC, M4A, OGG, OGA.</small>
+            </div>
+
+            <button class="btn btn-primary" id="transcribeButton" disabled>Átírás</button>
+        </div>
+        
+        <div id="process" class="tab-content">
+            <div class="progress-bar">
+                <div id="progress-bar" class="progress" style="width: 0%"></div>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <h3>Fájlméret</h3>
+                    <p id="file-size">0 B</p>
+                </div>
+                <div class="stat">
+                    <h3>Állapot</h3>
+                    <p id="status">Várakozás...</p>
+                </div>
+                <div class="stat">
+                    <h3>Feldolgozott darabok</h3>
+                    <p id="processed-chunks">0 / 0</p>
+                </div>
+            </div>
+            <label for="log">Napló</label>
+            <textarea id="log" readonly></textarea>
+        </div>
+        
+        <div id="output" class="tab-content">
+            <label for="result">Eredmény</label>
+            <div id="result" class="result"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script src="script.js"></script>
+</body>
+</html>
