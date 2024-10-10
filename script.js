@@ -9,10 +9,9 @@ const fileSizeDisplay = document.getElementById('file-size');
 const statusDisplay = document.getElementById('status');
 const processedChunksDisplay = document.getElementById('processed-chunks');
 const darkModeToggle = document.getElementById('darkModeToggle');
-const darkModeIcon = document.getElementById('darkModeIcon');
 const reformulateToggle = document.getElementById('reformulateToggle');
 
-const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
+const MAX_FILE_SIZE = 24 * 1024 * 1024; // 20MB
 
 // Load API key and dark mode preference from local storage on page load
 window.addEventListener('load', () => {
@@ -23,8 +22,6 @@ window.addEventListener('load', () => {
     const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
     if (darkModeEnabled) {
         document.body.classList.add('dark-mode');
-        darkModeIcon.className = 'bi bi-moon';
-        darkModeIcon.style.transform = 'translateX(25px)';
     }
     updateTranscribeButton();
     console.log("API key and dark mode preference loaded from local storage.");
@@ -300,8 +297,5 @@ function switchTab(tabId) {
 // Dark mode toggle functionality
 darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    localStorage.setItem('darkMode', isDarkMode);
-    darkModeIcon.className = isDarkMode ? 'bi bi-moon' : 'bi bi-sun';
-    darkModeIcon.style.transform = isDarkMode ? 'translateX(25px)' : 'translateX(0)';
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
 });

@@ -78,9 +78,15 @@ body.dark-mode .tab {
 }
 
 .tab.active {
-    background-color: #6c5ce7;
+    background-color: #f59a21; /* Changed to purple */
     color: #fff;
-    box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
+    box-shadow: 0 3px 10px rgba(142,68,173, 0.3); /* Changed to purple */
+    padding: 10px;
+    border-radius: 50px;
+    width: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .tab-content {
@@ -129,13 +135,13 @@ body.dark-mode input[type="file"] {
 
 input[type="text"]:focus,
 input[type="password"]:focus {
-    border-color: #6c5ce7;
+    border-color: #f59a21;
     box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
 }
 
 /* Buttons */
 button {
-    background-color: #6c5ce7;
+    background-color: #f59a21;
     color: #fff;
     border: none;
     padding: 12px 20px;
@@ -148,7 +154,7 @@ button {
 }
 
 button:hover {
-    background-color: #5a4bd1;
+    background-color: #f59a21;
     transform: translateY(-2px);
     box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
 }
@@ -162,7 +168,7 @@ button:disabled {
 
 /* Dark mode toggle button */
 #darkModeToggle {
-    background-color: #6c5ce7;
+    background-color: #f59a21;
     color: #fff;
     border: none;
     padding: 10px;
@@ -184,7 +190,7 @@ button:disabled {
 }
 
 #darkModeToggle:hover {
-    background-color: #5a4bd1;
+    background-color: #f59a21;
     transform: translateY(-2px);
     box-shadow: 0 3px 10px rgba(108, 92, 231, 0.3);
 }
@@ -213,7 +219,7 @@ body.dark-mode .progress-bar {
 .progress {
     width: 0;
     height: 10px;
-    background: linear-gradient(90deg, #6c5ce7, #a29bfe);
+    background: linear-gradient(90deg, #f59a21, #f5e321);
     border-radius: 50px;
     transition: width 0.3s ease;
 }
@@ -311,7 +317,7 @@ body.dark-mode .result {
     cursor: pointer;
     border: none;
     outline: none;
-    background-color: #6c5ce7; /* Purple background by default */
+    background-color: #f59a21; /* Purple background by default */
     border-radius: 50px;
     transition: all 0.3s ease;
     font-weight: 600;
@@ -362,4 +368,32 @@ body.dark-mode .output-box h3 {
     height: auto;
     max-height: 300px;
     transition: all 0.5s ease;
+}
+
+/* Specific style for #reformulateToggle */
+#reformulateToggle {
+    background-color: #f59a21; /* Purple */
+    color: white;
+    padding: 10px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+    width: 50px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 10px rgba(142, 68, 173, 0.3);
+    margin-right: 10px; /* Added margin to the right of the checkbox */
+}
+
+#reformulateToggle:hover {
+    background-color: #f59a21; /* Darker purple on hover */
+    box-shadow: 0 3px 10px rgba(142, 68, 173, 0.5);
+}
+
+.form-check-label {
+    padding-left: 10px; /* Added padding to the left of the label */
 }

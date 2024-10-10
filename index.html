@@ -10,9 +10,9 @@
 <body>
     <div class="container mt-5 position-relative">
         <h1>Whisper UI</h1>
-        <button id="darkModeToggle" class="btn btn-secondary position-absolute top-0 end-0 m-3">
-            <span id="darkModeIcon" class="bi bi-sun"></span>
-        </button>
+        <div class="form-check form-switch mb-3 position-absolute top-0 end-0 m-3" id="darkModeSwitchContainer">
+            <input class="form-check-input" type="checkbox" role="switch" id="darkModeToggle" >
+        </div>
         <p class="description">Hangfájlok átírása az OpenAI Whisper API segítségével</p>
         
         <div class="tabs">
@@ -35,11 +35,9 @@
             </div>
 
             <!-- Toggle for ChatGPT-4o Reformulation -->
-            <div class="form-check mb-3">
-                <input class="form-check-input" type="checkbox" id="reformulateToggle">
-                <label class="form-check-label" for="reformulateToggle">
-                    Formázás AI-val
-                </label>
+            <div class="form-check form-switch mb-3" id="reformulationSwitchContainer">
+                <input class="form-check-input" type="checkbox" role="switch" id="reformulateToggle" checked>
+                <label class="form-check-label" for="reformulateToggle">Formázás AI-val</label>
             </div>
 
             <button class="btn btn-primary" id="transcribeButton" disabled>Átírás</button>
