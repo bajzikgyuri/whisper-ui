@@ -34,6 +34,14 @@
                 <small class="form-text text-muted">Támogatott formátumok: MP3, MP4, MPEG, MPGA, WAV, WEBM, FLAC, M4A, OGG, OGA.</small>
             </div>
 
+            <!-- Toggle for ChatGPT-4o Reformulation -->
+            <div class="form-check mb-3">
+                <input class="form-check-input" type="checkbox" id="reformulateToggle">
+                <label class="form-check-label" for="reformulateToggle">
+                    Formázás AI-val
+                </label>
+            </div>
+
             <button class="btn btn-primary" id="transcribeButton" disabled>Átírás</button>
         </div>
         
@@ -60,8 +68,16 @@
         </div>
         
         <div id="output" class="tab-content">
-            <label for="result">Eredmény</label>
-            <div id="result" class="result"></div>
+            <div class="output-container">
+                <div class="output-box">
+                    <h3>Eredeti Szöveg</h3>
+                    <div id="original-output" class="result"></div>
+                </div>
+                <div class="output-box">
+                    <h3>Formázott Szöveg</h3>
+                    <div id="formatted-output" class="result"></div>
+                </div>
+            </div>
         </div>
     </div>
 
