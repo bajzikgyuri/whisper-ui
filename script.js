@@ -128,6 +128,8 @@ async function transcribeAudio(apiKey, audioFile) {
 
     updateStatistics(audioFile.size, 'Darabolás...', 0, totalChunks);
 
+    let previousChunkText = '';
+
     while (currentChunkStart < audioFile.size) {
         const currentChunkEnd = Math.min(currentChunkStart + chunkSize, audioFile.size);
         const chunk = audioFile.slice(currentChunkStart, currentChunkEnd, audioFile.type);
@@ -144,15 +146,25 @@ async function transcribeAudio(apiKey, audioFile) {
         // AI formatting for the chunk
         if (reformulateToggle.checked) {
             const chunkText = chunkResult.segments.map(segment => segment.text).join(' ');
+            
+            // Combine current chunk with the previous one for context
+            const textToFormat = previousChunkText + ' ' + chunkText;
+            
             try {
-                const formattedChunkText = await reformulateOutput(apiKey, chunkText);
-                formattedOutputDiv.innerHTML += formattedChunkText;
+                const formattedChunkText = await reformulateOutput(apiKey, textToFormat);
+                
+                // Only display the formatted text for the current chunk
+                const formattedCurrentChunk = formattedChunkText.slice(previousChunkText.length).trim();
+                formattedOutputDiv.innerHTML += formattedCurrentChunk;
                 formattedOutputDiv.style.display = 'block';
             } catch (error) {
                 logMessage(`Hiba a formázott szöveg lekérése során: ${error.message}`);
                 formattedOutputDiv.innerHTML += "Hiba a formázott szöveg lekérése során.";
                 formattedOutputDiv.style.display = 'block';
             }
+            
+            // Update previousChunkText for the next iteration
+            previousChunkText = chunkText;
         }
 
         combinedResult.segments.push(...chunkResult.segments);
@@ -174,7 +186,8 @@ async function reformulateOutput(apiKey, text) {
         messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: text }
-        ]
+        ],
+        temperature: 0 // Set temperature to 0 for deterministic output
     };
 
     try {
