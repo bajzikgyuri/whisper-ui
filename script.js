@@ -10,8 +10,10 @@ const statusDisplay = document.getElementById('status');
 const processedChunksDisplay = document.getElementById('processed-chunks');
 const darkModeToggle = document.getElementById('darkModeToggle');
 const reformulateToggle = document.getElementById('reformulateToggle');
+const outputContainer = document.querySelector('.output-container');
+const toastContainer = document.getElementById('toast-container');
 
-const MAX_FILE_SIZE = 24 * 1024 * 1024; // 20MB
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB for testing, change back to 24MB for production
 
 // Load API key and dark mode preference from local storage on page load
 window.addEventListener('load', () => {
@@ -107,7 +109,7 @@ async function transcribeChunk(apiKey, audioBlob, originalFilename, currentChunk
         return data;
     } catch (error) {
         logMessage(`Hiba a darab ${currentChunk}/${totalChunks} átírása során: ${error.message}`);
-        throw error; // Re-throw the error to be caught by the calling function
+        throw error;
     }
 }
 
@@ -117,14 +119,6 @@ async function transcribeAudio(apiKey, audioFile) {
     }
 
     updateStatistics(audioFile.size, 'Előkészítés...', 0, 0);
-
-    if (audioFile.size <= MAX_FILE_SIZE) {
-        logMessage(`Fájlméret: ${formatFileSize(audioFile.size)}. Közvetlen átírás...`);
-        const result = await transcribeChunk(apiKey, audioFile, audioFile.name, 1, 1);
-        return result;
-    }
-
-    logMessage(`Fájlméret: ${formatFileSize(audioFile.size)}. Túl nagy, darabolás és átírás...`);
 
     const chunkSize = MAX_FILE_SIZE;
     let currentChunkStart = 0;
@@ -138,9 +132,36 @@ async function transcribeAudio(apiKey, audioFile) {
         const currentChunkEnd = Math.min(currentChunkStart + chunkSize, audioFile.size);
         const chunk = audioFile.slice(currentChunkStart, currentChunkEnd, audioFile.type);
         const chunkResult = await transcribeChunk(apiKey, chunk, audioFile.name, currentChunk, totalChunks);
+        
+        // Format and display the chunk result
+        let formattedChunkOutput = '';
+        for (const segment of chunkResult.segments) {
+            const formattedSegmentText = segment.text.replace(/\.(\s|$)/g, '.$1\n');
+            formattedChunkOutput += `<div class="segment"><span class="segment-text">${formattedSegmentText}</span><span class="segment-timestamp">${formatTime(segment.start)}-${formatTime(segment.end)}</span></div>`;
+        }
+        originalOutputDiv.innerHTML += formattedChunkOutput;
+
+        // AI formatting for the chunk
+        if (reformulateToggle.checked) {
+            const chunkText = chunkResult.segments.map(segment => segment.text).join(' ');
+            try {
+                const formattedChunkText = await reformulateOutput(apiKey, chunkText);
+                formattedOutputDiv.innerHTML += formattedChunkText;
+                formattedOutputDiv.style.display = 'block';
+            } catch (error) {
+                logMessage(`Hiba a formázott szöveg lekérése során: ${error.message}`);
+                formattedOutputDiv.innerHTML += "Hiba a formázott szöveg lekérése során.";
+                formattedOutputDiv.style.display = 'block';
+            }
+        }
+
         combinedResult.segments.push(...chunkResult.segments);
         currentChunkStart = currentChunkEnd;
         currentChunk++;
+
+        // Update progress
+        updateProgress(((currentChunk - 1) / totalChunks) * 100, `Darab ${currentChunk - 1}/${totalChunks} kész`);
+        updateStatistics(audioFile.size, 'Feldolgozás...', currentChunk - 1, totalChunks);
     }
 
     return combinedResult;
@@ -149,7 +170,7 @@ async function transcribeAudio(apiKey, audioFile) {
 async function reformulateOutput(apiKey, text) {
     const systemPrompt = "Act like a professional Hungarian-language transcription editor with over 10 years of experience. Your primary role is to correct spelling, grammar, and formatting errors without altering the meaning or style. Follow these guidelines: 1. Correct all spelling errors based on standard Hungarian orthography. 2. Ensure proper grammar and punctuation (periods, commas, quotation marks, etc.). 3. Fix capitalization errors (proper nouns, sentence beginnings). 4. Correct formatting issues like dialogue or list layout. 5. Keep the output language the same as the input (Hungarian). 6. Do not rephrase or change the style or meaning. Focus only on technical corrections. Objective: Return an edited transcription with corrected errors while preserving the original meaning, style, and flow. Take a deep breath and work on this problem step-by-step.";
     const requestBody = {
-        model: "gpt-4o",
+        model: "gpt-4",
         messages: [
             { role: "system", content: systemPrompt },
             { role: "user", content: text }
@@ -188,55 +209,41 @@ transcribeButton.addEventListener('click', async () => {
 
     if (!apiKey) {
         logMessage('Hiba: Kérem adja meg az OpenAI API kulcsát.');
+        showToast('Hiba: Kérem adja meg az OpenAI API kulcsát.', 'error');
         return;
     }
 
     if (!audioFile) {
         logMessage('Hiba: Kérem válasszon ki egy hangfájlt.');
+        showToast('Hiba: Kérem válasszon ki egy hangfájlt.', 'error');
         return;
     }
 
     // Switch to the Process tab
     switchTab('process');
 
-    originalOutputDiv.innerHTML = "Átírás folyamatban...";
+    originalOutputDiv.innerHTML = "";
     formattedOutputDiv.innerHTML = "";
     logMessage('Átírás indul...');
     updateProgress(0, 'Átírás indul...');
     updateStatistics(0, 'Átírás indul...', 0, 0);
 
     try {
-        const transcribedResult = await transcribeAudio(apiKey, audioFile);
-        let formattedOutput = '';
-        let originalOutput = '';
-
-        for (const segment of transcribedResult.segments) {
-            originalOutput += `<div class="segment"><span class="segment-text">${segment.text}</span><span class="segment-timestamp">[${segment.start.toFixed(2)}-${segment.end.toFixed(2)}]</span></div>`;
-        }
-
-        if (reformulateToggle.checked) {
-            const combinedText = transcribedResult.segments.map(segment => segment.text).join(' ');
-            try {
-                formattedOutput = await reformulateOutput(apiKey, combinedText);
-                formattedOutputDiv.style.display = 'block';
-            } catch (error) {
-                logMessage(`Hiba a formázott szöveg lekérése során: ${error.message}`);
-                formattedOutput = "Hiba a formázott szöveg lekérése során.";
-                formattedOutputDiv.style.display = 'block';
-            }
-        } else {
-            formattedOutputDiv.style.display = 'none';
-        }
-
-        originalOutputDiv.innerHTML = originalOutput;
-        formattedOutputDiv.innerHTML = formattedOutput;
+        await transcribeAudio(apiKey, audioFile);
 
         logMessage('Átírás kész.');
         updateProgress(100, 'Átírás kész.');
         updateStatistics(audioFile.size, 'Kész', 0, 0);
+        showToast('Átírás sikeresen befejezve!', 'success');
 
         // Switch to the Output tab on success
         switchTab('output');
+
+        //Added code to make the output container full width
+        outputContainer.style.width = '100%';
+
+        // Add buttons to the "Eredeti Szöveg" and "Formázott Szöveg" boxes
+        addButtonsToOutputBoxes();
 
     } catch (error) {
         logMessage(`Hiba az átírás során: ${error.message}`);
@@ -244,6 +251,7 @@ transcribeButton.addEventListener('click', async () => {
         formattedOutputDiv.innerHTML = "";
         updateProgress(0, 'Hiba');
         updateStatistics(audioFile.size, 'Hiba', 0, 0);
+        showToast(`Hiba az átírás során: ${error.message}`, 'error');
 
         // Stay on the Process tab on failure
         switchTab('process');
@@ -253,25 +261,6 @@ transcribeButton.addEventListener('click', async () => {
 // Tab switching functionality
 const tabs = document.querySelectorAll('.tab');
 const tabContents = document.querySelectorAll('.tab-content');
-
-// Reference to the output sections
-const outputSections = document.querySelectorAll('.output-section');
-
-// Function to activate the output sections
-function activateOutputSections() {
-    outputSections.forEach(section => {
-        section.style.maxHeight = section.scrollHeight + "px";
-        section.classList.add('active');
-    });
-}
-
-// Function to deactivate the output sections
-function deactivateOutputSections() {
-    outputSections.forEach(section => {
-        section.style.maxHeight = null;
-        section.classList.remove('active');
-    });
-}
 
 tabs.forEach(tab => {
     tab.addEventListener('click', () => {
@@ -285,12 +274,8 @@ function switchTab(tabId) {
     tabContents.forEach(c => c.classList.remove('active'));
     document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
     document.getElementById(tabId).classList.add('active');
-
-    // Activate the output sections if the output tab is active
     if (tabId === 'output') {
-        activateOutputSections();
-    } else {
-        deactivateOutputSections();
+        outputContainer.style.width = '100%';
     }
 }
 
@@ -299,3 +284,89 @@ darkModeToggle.addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
 });
+
+
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+}
+
+function addButtonsToOutputBoxes() {
+    const originalBox = document.querySelector('#original-output').closest('.output-box');
+    const formattedBox = document.querySelector('#formatted-output').closest('.output-box');
+
+    addButtonsToBox(originalBox, 'original-output');
+    addButtonsToBox(formattedBox, 'formatted-output');
+}
+
+function addButtonsToBox(box, outputId) {
+    const buttonGroup = box.querySelector('.button-group');
+    if (buttonGroup) {
+        buttonGroup.innerHTML = ''; // Clear existing buttons
+        const copyButton = createButton('📋', () => copyText(document.getElementById(outputId).innerHTML));
+        const fullscreenButton = createButton('🔍', () => openModal(document.getElementById(outputId).innerHTML));
+        buttonGroup.appendChild(copyButton);
+        buttonGroup.appendChild(fullscreenButton);
+    }
+}
+
+function createButton(icon, onClick) {
+    const button = document.createElement('button');
+    button.innerHTML = icon;
+    button.classList.add('icon-button');
+    button.onclick = onClick;
+    return button;
+}
+
+function copyText(text) {
+    const cleanText = text.replace(/<[^>]*>/g, ''); // Remove HTML tags
+    navigator.clipboard.writeText(cleanText).then(() => {
+        showToast('Szöveg másolva!', 'success');
+    }, () => {
+        showToast('Hiba a másolás során!', 'error');
+    });
+}
+
+function openModal(htmlContent) {
+    const modal = document.createElement('div');
+    modal.classList.add('modal');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal(this)">×</span>
+            <div class="modal-text">${htmlContent}</div>
+        </div>`;
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal(modal);
+        }
+    });
+    document.body.appendChild(modal);
+}
+
+function closeModal(element) {
+    const modal = element.closest('.modal');
+    modal.remove();
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.classList.add('toast', `toast-${type}`);
+    toast.textContent = message;
+
+    toastContainer.appendChild(toast);
+
+    // Trigger a reflow
+    toast.offsetHeight;
+
+    // Add the 'show' class to start the transition
+    toast.classList.add('show');
+
+    // Remove the toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toastContainer.removeChild(toast);
+        }, 300); // Wait for the fade out transition to complete
+    }, 3000);
+}
