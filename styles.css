@@ -445,6 +445,8 @@ body.dark-mode .output-header h3 {
 
 /* New styles for improved transcription visualization */
 .segment {
+    display: flex;
+    align-items: flex-start;
     margin-bottom: 0.5rem;
     padding: 5px;
     border-radius: 5px;
@@ -456,17 +458,24 @@ body.dark-mode .segment {
 }
 
 .segment-text {
+    flex: 1;
     font-weight: normal;
-    margin-right: 0.5rem;
+    margin-left: 0.5rem;
 }
 
 .segment-timestamp {
-    font-size: smaller;
+    font-size: 0.8em;
     color: #777;
+    min-width: 80px;
+    text-align: right;
+    padding-right: 10px;
+    border-right: 1px solid #ccc;
+    user-select: none;
 }
 
 body.dark-mode .segment-timestamp {
     color: #bbb;
+    border-right-color: #555;
 }
 
 .result pre {

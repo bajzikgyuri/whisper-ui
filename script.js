@@ -139,7 +139,7 @@ async function transcribeAudio(apiKey, audioFile) {
         let formattedChunkOutput = '';
         for (const segment of chunkResult.segments) {
             const formattedSegmentText = segment.text.replace(/\.(\s|$)/g, '.$1\n');
-            formattedChunkOutput += `<div class="segment"><span class="segment-text">${formattedSegmentText}</span><span class="segment-timestamp">${formatTime(segment.start)}-${formatTime(segment.end)}</span></div>`;
+            formattedChunkOutput += `<div class="segment"><span class="segment-timestamp">${formatTime(segment.start)}-${formatTime(segment.end)}</span> <span class="segment-text">${formattedSegmentText}</span></div>`;
         }
         originalOutputDiv.innerHTML += formattedChunkOutput;
 
